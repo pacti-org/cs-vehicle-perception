@@ -9,5 +9,7 @@ Important links:
 
 ### Installation
 
+Run ```pdm install```
+
 ### Run
-The notebook evaluate_perception.ipynb for an instantiation of the car pedestrian example. 
+Run the notebook evaluate_perception.ipynb for an instantiation of the car pedestrian example. 
