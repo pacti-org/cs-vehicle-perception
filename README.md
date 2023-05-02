@@ -12,4 +12,7 @@ Important links:
 Run ```pdm install```
 
 ### Run
-Run the notebook evaluate_perception.ipynb for an instantiation of the car pedestrian example. 
+
+Run the notebook [`evaluate_perception.ipynb`](evaluate_perception.ipynb) for an instantiation of the car pedestrian example. 
+
+For scalability analysis, run the notebook [`evaluate_perception_scalability.ipynb`](evaluate_perception_scalability.ipynb) for a performance analysis that instantiates multiple car pedestrian examples.
