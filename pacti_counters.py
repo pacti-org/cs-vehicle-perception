@@ -106,6 +106,17 @@ class PolyhedralContractCounts:
         default_factory=lambda: PolyhedralContractSize(contract=None, max_values=False)
     )
 
+    def reset(self) -> None:
+        self.compose_count = 0
+        self.quotient_count = 0
+        self.merge_count = 0
+        self.compose_min_size = PolyhedralContractSize(contract=None, max_values=True)
+        self.quotient_min_size = PolyhedralContractSize(contract=None, max_values=True)
+        self.merge_min_size = PolyhedralContractSize(contract=None, max_values=True)
+        self.compose_max_size = PolyhedralContractSize(contract=None, max_values=False)
+        self.quotient_max_size = PolyhedralContractSize(contract=None, max_values=False)
+        self.merge_max_size = PolyhedralContractSize(contract=None, max_values=False)
+
     def update_counts(self) -> "PolyhedralContractCounts":
         self.compose_count = PolyhedralContract.compose.counter
         self.quotient_count = PolyhedralContract.quotient.counter
@@ -138,11 +149,21 @@ class PolyhedralContractCounts:
         return result
 
     def __str__(self) -> str:
+        def operation_msg(operation_count: int, min_size: PolyhedralContractSize, max_size: PolyhedralContractSize, operation_name: str) -> str:
+            if operation_count == 0:
+                return f"no {operation_name} operations\n"
+            else:
+                return f"min/max sizes for {operation_name}={min_size}/{max_size}\n"
+
+        compose_msg = operation_msg(self.compose_count, self.compose_min_size, self.compose_max_size, "compose")
+        quotient_msg = operation_msg(self.quotient_count, self.quotient_min_size, self.quotient_max_size, "quotient")
+        merge_msg = operation_msg(self.merge_count, self.merge_min_size, self.merge_max_size, "merge")
+
         return (
-            f"PolyhedralContract operation counts: compose={self.compose}, quotient={self.quotient}, merge={self.merge}.\n"
-            + f"min/max sizes for compose={self.compose_min_size}/{self.compose_max_size}\n"
-            + f"min/max sizes for quotient={self.quotient_min_size}/{self.quotient_max_size}\n"
-            + f"min/max sizes for merge={self.merge_min_size}/{self.merge_max_size}\n"
+            f"PolyhedralContract operation counts: compose={self.compose_count}, quotient={self.quotient_count}, merge={self.merge_count}.\n"
+            + compose_msg
+            + quotient_msg
+            + merge_msg
         )
 
 
@@ -181,16 +202,25 @@ class PolyhedralContractCountStats:
     )
 
     def stats(self) -> str:
+        def operation_stats(operation_name: str, min_count: int, max_count: int, avg_count: float, min_size: PolyhedralContractSize, max_size: PolyhedralContractSize) -> str:
+            if max_count == 0:
+                return f"no {operation_name} operations\n"
+            else:
+                return (
+                    f"{operation_name} invocation counts: (min: {min_count}, max: {max_count}, avg: {avg_count})\n"
+                    + f"min/max {operation_name} contract size: {min_size}/{max_size}\n"
+                )
+
+        compose_stats = operation_stats("compose", self.min_compose, self.max_compose, self.avg_compose, self.compose_min_size, self.compose_max_size)
+        quotient_stats = operation_stats("quotient", self.min_quotient, self.max_quotient, self.avg_quotient, self.quotient_min_size, self.quotient_max_size)
+        merge_stats = operation_stats("merge", self.min_merge, self.max_merge, self.avg_merge, self.merge_min_size, self.merge_max_size)
+
         return (
             "Pacti compose,quotient,merge statistics:\n"
-            + f"min invocation counts: (compose: {self.min_compose}, quotient: {self.min_quotient}, merge: {self.min_merge})\n"
-            + f"max invocation counts: (compose: {self.max_compose}, quotient: {self.max_quotient}, merge: {self.max_merge})\n"
-            + f"avg invocation counts: (compose: {self.avg_compose}, quotient: {self.avg_quotient}, merge: {self.avg_merge})\n"
-            + f"min/max compose contract size  : {self.compose_min_size}/{self.compose_max_size}\n"
-            + f"min/max quotient contract size : {self.quotient_min_size}/{self.quotient_max_size}\n"
-            + f"min/max merge contract size    : {self.merge_min_size}/{self.merge_max_size}\n"
+            + compose_stats
+            + quotient_stats
+            + merge_stats
         )
-
 
 def polyhedral_count_stats(counts: List[PolyhedralContractCounts]) -> PolyhedralContractCountStats:
     stats = PolyhedralContractCountStats()
