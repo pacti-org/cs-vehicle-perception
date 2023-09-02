@@ -1,6 +1,6 @@
 from functools import wraps
 from typing import List, Optional
-from pacti.terms.polyhedra import PolyhedralContract
+from pacti.contracts import PolyhedralIoContract
 
 import sys
 import functools
@@ -16,7 +16,7 @@ class PolyhedralContractSize:
     # The count of input and output variables.
     variables: int = 0
 
-    def __init__(self, contract: Optional[PolyhedralContract], max_values: bool = False):
+    def __init__(self, contract: Optional[PolyhedralIoContract], max_values: bool = False):
         if max_values:
             self.constraints = sys.maxsize
             self.variables = sys.maxsize
@@ -75,9 +75,9 @@ def statistics_decorator(fn):
     return wrapper
 
 
-PolyhedralContract.compose = statistics_decorator(PolyhedralContract.compose)
-PolyhedralContract.quotient = statistics_decorator(PolyhedralContract.quotient)
-PolyhedralContract.merge = statistics_decorator(PolyhedralContract.merge)
+PolyhedralIoContract.compose = statistics_decorator(PolyhedralIoContract.compose)
+PolyhedralIoContract.quotient = statistics_decorator(PolyhedralIoContract.quotient)
+PolyhedralIoContract.merge = statistics_decorator(PolyhedralIoContract.merge)
 
 
 @dataclasses.dataclass
@@ -118,17 +118,17 @@ class PolyhedralContractCounts:
         self.merge_max_size = PolyhedralContractSize(contract=None, max_values=False)
 
     def update_counts(self) -> "PolyhedralContractCounts":
-        self.compose_count = PolyhedralContract.compose.counter
-        self.quotient_count = PolyhedralContract.quotient.counter
-        self.merge_count = PolyhedralContract.merge.counter
+        self.compose_count = PolyhedralIoContract.compose.counter
+        self.quotient_count = PolyhedralIoContract.quotient.counter
+        self.merge_count = PolyhedralIoContract.merge.counter
 
-        self.compose_min_size = PolyhedralContract.compose.min_size
-        self.quotient_min_size = PolyhedralContract.quotient.min_size
-        self.merge_min_size = PolyhedralContract.merge.min_size
+        self.compose_min_size = PolyhedralIoContract.compose.min_size
+        self.quotient_min_size = PolyhedralIoContract.quotient.min_size
+        self.merge_min_size = PolyhedralIoContract.merge.min_size
 
-        self.compose_max_size = PolyhedralContract.compose.max_size
-        self.quotient_max_size = PolyhedralContract.quotient.max_size
-        self.merge_max_size = PolyhedralContract.merge.max_size
+        self.compose_max_size = PolyhedralIoContract.compose.max_size
+        self.quotient_max_size = PolyhedralIoContract.quotient.max_size
+        self.merge_max_size = PolyhedralIoContract.merge.max_size
 
         return self
 
@@ -160,7 +160,7 @@ class PolyhedralContractCounts:
         merge_msg = operation_msg(self.merge_count, self.merge_min_size, self.merge_max_size, "merge")
 
         return (
-            f"PolyhedralContract operation counts: compose={self.compose_count}, quotient={self.quotient_count}, merge={self.merge_count}.\n"
+            f"PolyhedralIoContract operation counts: compose={self.compose_count}, quotient={self.quotient_count}, merge={self.merge_count}.\n"
             + compose_msg
             + quotient_msg
             + merge_msg
